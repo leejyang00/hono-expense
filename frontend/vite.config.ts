@@ -1,9 +1,10 @@
-import path from "path"
-import react from "@vitejs/plugin-react"
-import { defineConfig } from "vite"
+import path from "path";
+import react from "@vitejs/plugin-react";
+import { TanStackRouterVite } from '@tanstack/router-plugin/vite'
+import { defineConfig } from "vite";
 
 export default defineConfig({
-  plugins: [react()],
+  plugins: [react(), TanStackRouterVite()],
   resolve: {
     alias: {
       "@": path.resolve(import.meta.dir, "./src"),
@@ -15,7 +16,7 @@ export default defineConfig({
       "/api": {
         target: "http://127.0.0.1:3000",
         changeOrigin: true,
-      }
+      },
     },
   },
-})
+});

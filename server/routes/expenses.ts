@@ -19,7 +19,7 @@ const fakeExpenses: Expense[] = [
 
 export const expensesRoute = new Hono()
   .get("/", (c) => {
-    return c.json({ expense: [fakeExpenses] });
+    return c.json({ expenses: fakeExpenses });
   })
   .get("/:id{[0-9]+}", (c) => {
     const id = Number.parseInt(c.req.param("id"));
@@ -29,7 +29,7 @@ export const expensesRoute = new Hono()
     }
     return c.json({ expense });
   })
-  .get("/total-spent", (c) => {
+  .get("/total-spent", async (c) => {
     const total = fakeExpenses.reduce((acc, expense) => acc + expense.amount, 0);
     return c.json({ total });
   })
