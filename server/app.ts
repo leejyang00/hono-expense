@@ -3,14 +3,16 @@ import { logger } from "hono/logger";
 import { expensesRoute } from "./routes/expenses";
 
 import { serveStatic } from "hono/bun";
+import { authRoute } from "./routes/auth";
 
 const app = new Hono();
 
 app.use(logger());
 
-// app.get("/test", (c) => c.json({ message: "hello world" }));
-
-const apiRoutes = app.basePath("/api").route("/expenses", expensesRoute);
+const apiRoutes = app
+  .basePath("/api")
+  .route("/expenses", expensesRoute)
+  .route("/", authRoute);
 
 app.get("*", serveStatic({ root: "./frontend/dist" }));
 app.get("*", serveStatic({ path: "./static/dist/index.html" }));
