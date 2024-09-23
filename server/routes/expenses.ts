@@ -4,23 +4,9 @@ import { zValidator } from "@hono/zod-validator";
 import { getUser } from "../kinde";
 
 import { db } from "../db";
-import { expenses as expenseTable } from "../db/schema/expenses";
+import { expenses as expenseTable, insertExpenseSchema } from "../db/schema/expenses";
 import { desc, eq, sum, and } from "drizzle-orm";
-
-const expenseSchema = z.object({
-  id: z.number().int().positive().min(1),
-  title: z.string().min(3).max(100),
-  amount: z.string(),
-});
-
-type Expense = z.infer<typeof expenseSchema>;
-const createPostSchema = expenseSchema.omit({ id: true });
-
-// const fakeExpenses: Expense[] = [
-//   { id: 1, title: "Groceries", amount: "100" },
-//   { id: 2, title: "Rent", amount: "1000" },
-//   { id: 3, title: "Utilities", amount: "200" },
-// ];
+import { createExpenseSchema } from "../sharedTypes";
 
 export const expensesRoute = new Hono()
   .get("/", getUser, async (c) => {
@@ -60,16 +46,22 @@ export const expensesRoute = new Hono()
       .then((res) => res[0]);
     return c.json(result);
   })
-  .post("/", getUser, zValidator("json", createPostSchema), async (c) => {
+  .post("/", getUser, zValidator("json", createExpenseSchema), async (c) => {
+    // zod validation middleware will validate the request body against the schema
     const expense = await c.req.valid("json");
     const user = c.var.user;
 
+    // DB schema validation before inserting
+    const validatedExpense = insertExpenseSchema.parse({
+      ...expense,
+      userId: user.id,
+    });
+
+    // can add custom error handling here
+
     const result = await db
       .insert(expenseTable)
-      .values({
-        ...expense,
-        userId: user.id,
-      })
+      .values(validatedExpense)
       .returning();
 
     c.status(201);
