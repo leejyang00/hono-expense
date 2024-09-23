@@ -1,42 +1,42 @@
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Button } from "@/components/ui/button";
+import { createFileRoute, useNavigate } from '@tanstack/react-router'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
+import { Button } from '@/components/ui/button'
 
-import { useForm } from "@tanstack/react-form";
-import { api } from "@/lib/api";
+import { useForm } from '@tanstack/react-form'
+import { api } from '@/lib/api'
 
-export const Route = createFileRoute("/create-expense")({
+export const Route = createFileRoute('/_authenticated/create-expense')({
   component: CreateExpense,
-});
+})
 
 function CreateExpense() {
-  const navigate = useNavigate();
+  const navigate = useNavigate()
 
   const form = useForm({
     defaultValues: {
-      title: "",
+      title: '',
       amount: 0,
     },
     onSubmit: async ({ value }) => {
-      await new Promise((resolve) => setTimeout(resolve, 3000));
+      await new Promise((resolve) => setTimeout(resolve, 3000))
 
-      const res = await api.expenses.$post({ json: value });
+      const res = await api.expenses.$post({ json: value })
       if (!res.ok) {
-        throw new Error("Failed to create expense");
+        throw new Error('Failed to create expense')
       }
-      navigate({ to: "/expenses" });
+      navigate({ to: '/expenses' })
     },
-  });
+  })
   return (
     <div className="p-2">
       <h2>Create Expense</h2>
       <form
         className="m-auto max-w-xl"
         onSubmit={(e) => {
-          e.preventDefault();
-          e.stopPropagation();
-          form.handleSubmit();
+          e.preventDefault()
+          e.stopPropagation()
+          form.handleSubmit()
         }}
       >
         {/* A type-safe field component*/}
@@ -71,10 +71,10 @@ function CreateExpense() {
                 />
                 {field.state.meta.isTouched &&
                 field.state.meta.errors.length ? (
-                  <em>{field.state.meta.errors.join(", ")}</em>
+                  <em>{field.state.meta.errors.join(', ')}</em>
                 ) : null}
               </>
-            );
+            )
           }}
         />
         <form.Field
@@ -93,21 +93,21 @@ function CreateExpense() {
                 />
                 {field.state.meta.isTouched &&
                 field.state.meta.errors.length ? (
-                  <em>{field.state.meta.errors.join(", ")}</em>
+                  <em>{field.state.meta.errors.join(', ')}</em>
                 ) : null}
               </>
-            );
+            )
           }}
         />
         <form.Subscribe
           selector={(state) => [state.canSubmit, state.isSubmitting]}
           children={([canSubmit, isSubmitting]) => (
             <Button type="submit" disabled={!canSubmit}>
-              {isSubmitting ? "..." : "Submit"}
+              {isSubmitting ? '...' : 'Submit'}
             </Button>
           )}
         />
       </form>
     </div>
-  );
+  )
 }
