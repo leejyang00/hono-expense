@@ -36,7 +36,7 @@ function CreateExpense() {
   });
   return (
     <div className="p-2">
-      <h2>Create Expense</h2>
+      <h2 className="text-2xl font-bold text-center ">Create Expense</h2>
       <form
         className="m-auto max-w-xl flex flex-col gap-y-4"
         onSubmit={(e) => {
@@ -121,7 +121,7 @@ function CreateExpense() {
         <form.Subscribe
           selector={(state) => [state.canSubmit, state.isSubmitting]}
           children={([canSubmit, isSubmitting]) => (
-            <Button type="submit" disabled={!canSubmit}>
+            <Button className="self-center" type="submit" disabled={!canSubmit}>
               {isSubmitting ? "..." : "Submit"}
             </Button>
           )}
