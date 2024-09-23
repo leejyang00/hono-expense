@@ -15,6 +15,13 @@
       "when": 1727071617599,
       "tag": "0001_lonely_liz_osborn",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1727096408317,
+      "tag": "0002_living_satana",
+      "breakpoints": true
     }
   ]
 }

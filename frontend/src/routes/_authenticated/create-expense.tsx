@@ -3,6 +3,7 @@ import { zodValidator } from "@tanstack/zod-form-adapter";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
+import { Calendar } from "@/components/ui/calendar";
 
 import { useForm } from "@tanstack/react-form";
 import { api } from "@/lib/api";
@@ -21,6 +22,7 @@ function CreateExpense() {
     defaultValues: {
       title: "",
       amount: "0",
+      date: new Date().toISOString(),
     },
     onSubmit: async ({ value }) => {
       await new Promise((resolve) => setTimeout(resolve, 3000));
@@ -38,7 +40,7 @@ function CreateExpense() {
       <form
         className="m-auto max-w-xl flex flex-col gap-y-4"
         onSubmit={(e) => {
-          e.preventDefault(); 
+          e.preventDefault();
           e.stopPropagation();
           form.handleSubmit();
         }}
@@ -85,6 +87,28 @@ function CreateExpense() {
                   onBlur={field.handleBlur}
                   type="number"
                   onChange={(e) => field.handleChange(e.target.value)}
+                />
+                {field.state.meta.isTouched &&
+                field.state.meta.errors.length ? (
+                  <em>{field.state.meta.errors.join(", ")}</em>
+                ) : null}
+              </div>
+            );
+          }}
+        />
+        <form.Field
+          name="date"
+          validators={{
+            onChange: createExpenseSchema.shape.date,
+          }}
+          children={(field) => {
+            return (
+              <div className="self-center">
+                <Calendar
+                  mode="single"
+                  selected={new Date(field.state.value)}
+                  onSelect={(date) => field.handleChange((date ?? new Date()).toISOString())}
+                  className="rounded-md border"
                 />
                 {field.state.meta.isTouched &&
                 field.state.meta.errors.length ? (
