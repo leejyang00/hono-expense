@@ -27,7 +27,7 @@ function Profile() {
           Hello {data.user.given_name} {data.user.family_name}
         </p>
       </div>
-      <Button asChild className="my-6">
+      <Button asChild className="my-5">
         <a href="/api/logout">Logout</a>
       </Button>
     </div>

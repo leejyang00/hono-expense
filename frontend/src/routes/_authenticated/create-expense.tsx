@@ -6,15 +6,19 @@ import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
 
 import { useForm } from "@tanstack/react-form";
-import { api } from "@/lib/api";
+import { createExpense, getAllExpensesQueryOptions, loadingCreateExpenseQueryOptions } from "@/lib/api";
+import { useQueryClient } from "@tanstack/react-query";
 
 import { createExpenseSchema } from "@server/sharedTypes";
+import { toast } from "sonner"
 
 export const Route = createFileRoute("/_authenticated/create-expense")({
   component: CreateExpense,
 });
 
 function CreateExpense() {
+  const queryClient = useQueryClient();
+
   const navigate = useNavigate();
 
   const form = useForm({
@@ -25,13 +29,39 @@ function CreateExpense() {
       date: new Date().toISOString(),
     },
     onSubmit: async ({ value }) => {
-      await new Promise((resolve) => setTimeout(resolve, 3000));
-
-      const res = await api.expenses.$post({ json: value });
-      if (!res.ok) {
-        throw new Error("Failed to create expense");
-      }
+      // get whats already in the cache
+      const existingExpenses = await queryClient.ensureQueryData(
+        getAllExpensesQueryOptions
+      );
       navigate({ to: "/expenses" });
+
+      // loading state
+      queryClient.setQueryData(loadingCreateExpenseQueryOptions.queryKey, { expense: value });
+
+      // happens in the background
+      try {
+        const newExpense = await createExpense({ value });
+        // success state
+        // update the cache
+        queryClient.setQueryData(getAllExpensesQueryOptions.queryKey, {
+          ...existingExpenses,
+          expenses: [newExpense, ...existingExpenses.expenses],
+        });
+
+        toast("Expense created", {
+          description: `Successfully created new expense ${newExpense.id}`,
+        })
+      } catch (error) {
+        toast("Error", {
+          description: "Failed to create new expense",
+          // action: {
+          //   label: "Undo",
+          //   onClick: () => console.log("Undo"),
+          // },
+        })
+      } finally {
+        queryClient.setQueryData(loadingCreateExpenseQueryOptions.queryKey, {});
+      }
     },
   });
   return (
@@ -107,7 +137,9 @@ function CreateExpense() {
                 <Calendar
                   mode="single"
                   selected={new Date(field.state.value)}
-                  onSelect={(date) => field.handleChange((date ?? new Date()).toISOString())}
+                  onSelect={(date) =>
+                    field.handleChange((date ?? new Date()).toISOString())
+                  }
                   className="rounded-md border"
                 />
                 {field.state.meta.isTouched &&
