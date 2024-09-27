@@ -69,7 +69,7 @@ export const expensesRoute = new Hono()
   })
   .delete("/:id{[0-9]+}", getUser, async (c) => {
     const id = Number.parseInt(c.req.param("id"));
-    const user = c.var.user;
+    const user = c.var.user; // testing
 
     const expense = await db
       .delete(expenseTable)
